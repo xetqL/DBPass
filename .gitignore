@@ -12,6 +12,7 @@ src_managed/
 project/boot/
 project/plugins/project/
 
+
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
@@ -62,3 +63,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+
+# intelliJ specific
+.idea/
