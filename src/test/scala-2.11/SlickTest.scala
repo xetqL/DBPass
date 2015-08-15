@@ -21,8 +21,8 @@ class SlickTest extends FunSuite with BeforeAndAfter with ScalaFutures{
     def insertUser(): Int =
         db.run(dal.insert(User("Jon", "Password"))).futureValue
 
-    def getUser(u:User) = {
-        db.run(dal.get(u)).futureValue
+    def check(u:User) = {
+        db.run(dal.check(u)).futureValue
     }
 
     before {
@@ -56,9 +56,9 @@ class SlickTest extends FunSuite with BeforeAndAfter with ScalaFutures{
     test("Get user works") {
         createSchema()
         insertUser()
-        val results1 = getUser(User("Jon", "Password"))
+        val results1 = check(User("Jon", "Password"))
         assert(results1.isDefined)
-        val results2 = getUser(User("Nope", "Caca"))
+        val results2 = check(User("Nope", "Caca"))
         assert(!results2.isDefined)
     }
 

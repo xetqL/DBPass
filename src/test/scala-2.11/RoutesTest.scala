@@ -27,8 +27,6 @@ class RoutesTest extends Specification with Specs2RouteTest with IDBService with
     def insertUser(u:User) : Int =
         db.run(dal.insert(u)).futureValue
 
-    def getUser(u:User) =
-        db.run(dal.get(u)).futureValue
 
     createSchema()
     insertUser(goodUser)
@@ -36,13 +34,13 @@ class RoutesTest extends Specification with Specs2RouteTest with IDBService with
     "The shutdown route" should {
 
         "return a rejected response when submitting a bad pair(username:token)" in {
-            Get("/shutdown") ~> unvalidCredentialsDirective ~> shutdownRoute ~> check {
-                status === StatusCodes.Unauthorized
+            Get("/shutdown") ~> shutdownRoute ~> check {
+                status === StatusCodes.BadRequest
             }
         }
 
         "return a accepted response when submitting a valid pair(username:token)" in {
-            Get("/shutdown") ~> validCredentialsDirective ~> shutdownRoute ~> check {
+            Get("/shutdown") ~> shutdownRoute ~> check {
                 status === StatusCodes.OK
             }
         }

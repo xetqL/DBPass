@@ -1,6 +1,7 @@
 package util
 import java.sql.DriverManager
 import Model.{DAL, User}
+import Model.User._
 import spray.routing.authentication.UserPass
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -35,7 +36,7 @@ object Util {
 
     def userPassAuth(userPass: Option[UserPass])(implicit db:Database, dal:DAL): Future[Option[User]] = {
         userPass match {
-            case Some(u) => db.run(dal.get(u))
+            case Some(u) => db.run(dal.get(u.user))
             case _ => Future {
                 None
             }

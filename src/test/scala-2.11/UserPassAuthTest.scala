@@ -20,9 +20,7 @@ class UserPassAuthTest extends FunSuite with BeforeAndAfter with ScalaFutures {
     def insertUser(u:User): Int =
         db.run(dal.insert(u)).futureValue
 
-    def getUser(u:User) = {
-        db.run(dal.get(u)).futureValue
-    }
+
 
     before {
         db = Database.forConfig("h2mem1")

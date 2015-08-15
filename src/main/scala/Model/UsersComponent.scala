@@ -37,8 +37,13 @@ trait UsersComponent {
 
     def insert(user: User) = users += user
     def insertAndRun(user:User)(implicit db : slick.jdbc.JdbcBackend.Database) = db.run(users += user)
-    def get (user:User) = {
+    def check (user:User) = {
         val q = for {u <- users if (u.username === user.username) && (u.passwordHash === Util.cypher(user.password))} yield u
+        q.result.headOption
+    }
+
+    def get(username:String) = {
+        val q = for {u <- users if (u.username === username)} yield u
         q.result.headOption
     }
 }
