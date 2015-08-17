@@ -17,10 +17,10 @@ trait KeysComponent { this: DriverComponent with UsersComponent =>
         def user = foreignKey("userfk_keys", userID, users)(_.userID, onUpdate = ForeignKeyAction.Cascade, onDelete = ForeignKeyAction.Cascade)
 
         def forWhat: Rep[String] = column[String]("token", O.Length(255))
-
+        // scalastyle:off method.name
         def * : ProvenShape[(Int, String, Int)] = (pwdID , forWhat, userID)
+        // scalastyle:on method.name
     }
 
     val keys = TableQuery[Keys]
-
 }

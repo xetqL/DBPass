@@ -20,9 +20,9 @@ object Util {
     }
 
     implicit class ListUtil[A] (data: List[A]){
-        def containsAll(list: List[A]): Boolean ={
+        def containsAll(list: List[A]): Boolean = {
             @tailrec
-            def containsAllRec(list:List[A], acc:List[A]) : Boolean = {
+            def containsAllRec(list: List[A], acc: List[A]) : Boolean = {
                 acc match {
                     case Nil => true
                     case head :: tail => if(list.contains(head)) containsAllRec(list, tail) else containsAllRec(list, acc)
@@ -32,9 +32,9 @@ object Util {
         }
     }
 
-    def cypher(word:String) = word
+    def cypher(word: String) = word
 
-    def userPassAuth(userPass: Option[UserPass])(implicit db:Database, dal:DAL): Future[Option[User]] = {
+    def userPassAuth(userPass: Option[UserPass])(implicit db: Database, dal: DAL): Future[Option[User]] = {
         userPass match {
             case Some(u) => db.run(dal.get(u.user))
             case _ => Future {
@@ -42,4 +42,6 @@ object Util {
             }
         }
     }
+
+    def generateToken : String = java.util.UUID.randomUUID().toString
 }

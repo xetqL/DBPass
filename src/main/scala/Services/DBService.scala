@@ -6,12 +6,10 @@ import java.lang.Exception
 import DBPass.Services.Action.Shutdown
 import Model.DAL
 import Services.{LoginResponseComponent, ActionResponseComponent, Response}
-import akka.actor.{ActorContext, Actor, ActorLogging}
-import spray.httpx.marshalling.ToResponseMarshallable
-import spray.json.{JsString, JsObject}
+import akka.actor.{ActorContext, Actor}
 import slick.jdbc.JdbcBackend.Database
-import spray.routing.authentication.{BasicAuth, UserPass}
-import scala.concurrent.{Await, Promise}
+import spray.routing.authentication.{BasicAuth}
+import scala.concurrent.{Future, Await, Promise}
 import scala.concurrent.duration._
 import spray.routing._
 import spray.util._
@@ -19,7 +17,7 @@ import spray.http._
 import Model.{User, Token}
 import util.Util.userPassAuth
 import scala.util.Success
-import scala.util.control.Exception
+import util.Util
 
 /**
  * Created by aboul on 05.08.2015.
@@ -56,37 +54,34 @@ trait IDBService extends HttpService {
                     p => {
                         complete {
                             val pResponse = Promise[HttpResponse]
-                            lazy val badRequest =
-                                HttpResponse(StatusCodes.BadRequest, new Response(Status.Rejected(), "bad username : token provided") with ActionResponseComponent {
-                                    val action = Shutdown()
-                                }.toJSON.prettyPrint)
-                            lazy val goodRequest =
-                                HttpResponse(StatusCodes.OK, new Response(Status.Accepted(), "Shutdown scheduled") with ActionResponseComponent {
+                            lazy val responseOn: (StatusCode, String) => HttpResponse = (statusCode, message) =>
+                                HttpResponse(statusCode, new Response(Status.Rejected(), message) with ActionResponseComponent {
                                     val action = Shutdown()
                                 }.toJSON.prettyPrint)
                             try {
                                 val token = p("token")
-                                val retrieve = db.run(dal.get(p("username"))).flatMap {
+                                db.run(dal.get(p("username"))).flatMap {
                                     case Some(user) => db.run(dal.get(user.userID, token))
-                                    case _ => throw new Exception()
-                                }
-                                val r = retrieve onComplete {
+                                    case _ => Future {
+                                        None
+                                    }
+                                } onComplete {
                                     case Success(Some(_)) => {
                                         in(2.second) {
                                             db.close()
                                             actorSystem.shutdown()
                                         }
-                                        pResponse success goodRequest
+                                        pResponse success responseOn(StatusCodes.OK, "shutdown scheduled")
                                     }
-                                    case _ => throw new Exception()
+                                    case _ => pResponse success responseOn(StatusCodes.BadRequest, "inexistent or expired token")
                                 }
                                 Await.result(pResponse.future, Duration.Inf)
                                 pResponse.future.value match {
                                     case Some(r) => r
-                                    case _ => badRequest
+                                    case _ => responseOn(StatusCodes.BadRequest, "unauthorized")
                                 }
-                            } catch {
-                                case _ => badRequest
+                            }catch{
+                                case _ : Throwable => responseOn(StatusCodes.BadRequest, "unauthorized")
                             }
                         }
                     }
@@ -100,27 +95,27 @@ trait IDBService extends HttpService {
             post {
                 authenticate(BasicAuth(userPassAuth _, realm = "secure site")) { user =>
                     complete {
-                        lazy val badRequest =
+                        lazy val responseOnBadRequest =
                             HttpResponse(StatusCodes.BadRequest, new Response(Status.Rejected(), "bad username : token provided") with ActionResponseComponent {
                                 val action = Shutdown()
                             }.toJSON.prettyPrint)
-                        lazy val goodRequest : String => HttpResponse = generatedToken =>
-                            HttpResponse(StatusCodes.OK,new Response(Status.Accepted(), "message successfully logged in") with LoginResponseComponent {
+                        lazy val responseOnGoodRequest: String => HttpResponse = generatedToken =>
+                            HttpResponse(StatusCodes.OK, new Response(Status.Accepted(), "message successfully logged in") with LoginResponseComponent {
                                 val token = generatedToken
                             }.toJSON.prettyPrint)
+                        lazy val token = Util.generateToken
                         val pResponse = Promise[HttpResponse]
-                        val retrieve = db.run(dal.get(user.user))
-                        retrieve onComplete {
-                            case Success(Some(user)) => {
-                                val generatedToken = "hee" //dal.generate()
-                                pResponse success goodRequest(generatedToken)
+                        db.run(dal.get(user.user)) onComplete {
+                            case Success(Some(user)) => db.run(dal.addTokenFor(user.userID, token)) onComplete {
+                                case Success(id) => pResponse success responseOnGoodRequest(token)
+                                case _ => pResponse success responseOnBadRequest
                             }
-                            case _ => pResponse success badRequest
+                            case _ => pResponse success responseOnBadRequest
                         }
                         Await.result(pResponse.future, Duration.Inf)
                         pResponse.future.value match {
-                            case Some(r) => r
-                            case _ => badRequest
+                            case Some(response) => response
+                            case _ => responseOnBadRequest
                         }
                     }
                 }

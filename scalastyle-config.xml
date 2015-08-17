@@ -6,26 +6,39 @@
             <parameter name="maxFileLength"><![CDATA[800]]></parameter>
         </parameters>
     </check>
+
     <check level="warning" class="org.scalastyle.scalariform.SpacesAfterPlusChecker" enabled="true"></check>
-    <check level="warning" class="org.scalastyle.file.WhitespaceEndOfLineChecker" enabled="true"></check>
     <check level="warning" class="org.scalastyle.scalariform.SpacesBeforePlusChecker" enabled="true"></check>
+
+    <check enabled="true" class="org.scalastyle.scalariform.EnsureSingleSpaceAfterTokenChecker" level="error">
+        <parameters>
+            <parameter name="tokens">COLON,COMMA</parameter>
+        </parameters>
+    </check>
+
+    <check enabled="true" class="org.scalastyle.scalariform.SpaceAroundTokenChecker" level="error">
+        <parameters>
+            <parameter name="tokens">ARROW, EQUALS, SUBTYPE, SUPERTYPE</parameter>
+        </parameters>
+    </check>
+
     <check level="warning" class="org.scalastyle.file.FileLineLengthChecker" enabled="true">
         <parameters>
-            <parameter name="maxLineLength"><![CDATA[160]]></parameter>
+            <parameter name="maxLineLength"><![CDATA[200]]></parameter>
             <parameter name="tabSize"><![CDATA[4]]></parameter>
         </parameters>
     </check>
-    <check level="warning" class="org.scalastyle.scalariform.ClassNamesChecker" enabled="true">
+    <check level="error" class="org.scalastyle.scalariform.ClassNamesChecker" enabled="true">
         <parameters>
             <parameter name="regex"><![CDATA[[A-Z][A-Za-z]*]]></parameter>
         </parameters>
     </check>
-    <check level="warning" class="org.scalastyle.scalariform.ObjectNamesChecker" enabled="true">
+    <check level="error" class="org.scalastyle.scalariform.ObjectNamesChecker" enabled="true">
         <parameters>
             <parameter name="regex"><![CDATA[[A-Z][A-Za-z]*]]></parameter>
         </parameters>
     </check>
-    <check level="warning" class="org.scalastyle.scalariform.PackageObjectNamesChecker" enabled="true">
+    <check level="error" class="org.scalastyle.scalariform.PackageObjectNamesChecker" enabled="true">
         <parameters>
             <parameter name="regex"><![CDATA[^[a-z][A-Za-z]*$]]></parameter>
         </parameters>
@@ -41,7 +54,7 @@
             <parameter name="maxParameters"><![CDATA[8]]></parameter>
         </parameters>
     </check>
-    <check level="warning" class="org.scalastyle.scalariform.MagicNumberChecker" enabled="true">
+    <check level="info" class="org.scalastyle.scalariform.MagicNumberChecker" enabled="true">
         <parameters>
             <parameter name="ignore"><![CDATA[-1,0,1,2,3]]></parameter>
         </parameters>
@@ -82,7 +95,7 @@
             <parameter name="maxLength"><![CDATA[50]]></parameter>
         </parameters>
     </check>
-    <check level="warning" class="org.scalastyle.scalariform.MethodNamesChecker" enabled="true">
+    <check level="error" class="org.scalastyle.scalariform.MethodNamesChecker" enabled="true">
         <parameters>
             <parameter name="regex"><![CDATA[^[a-z][A-Za-z0-9]*$]]></parameter>
         </parameters>
@@ -93,6 +106,4 @@
         </parameters>
     </check>
     <check level="warning" class="org.scalastyle.scalariform.PublicMethodsHaveTypeChecker" enabled="true"></check>
-    <check level="warning" class="org.scalastyle.file.NewLineAtEofChecker" enabled="true"></check>
-    <check level="warning" class="org.scalastyle.file.NoNewLineAtEofChecker" enabled="false"></check>
 </scalastyle>

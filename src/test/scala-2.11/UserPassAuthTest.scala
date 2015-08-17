@@ -20,8 +20,6 @@ class UserPassAuthTest extends FunSuite with BeforeAndAfter with ScalaFutures {
     def insertUser(u:User): Int =
         db.run(dal.insert(u)).futureValue
 
-
-
     before {
         db = Database.forConfig("h2mem1")
     }
@@ -31,7 +29,7 @@ class UserPassAuthTest extends FunSuite with BeforeAndAfter with ScalaFutures {
     test("UserPassAuth works correctly"){
         createSchema()
         insertUser(goodUser)
-        val r = userPassAuth(Some(goodUser))(db,dal).futureValue
+        val r = userPassAuth(Some(goodUser))(db, dal).futureValue
         assert(r.exists(u => (u.username == goodUser.username) && (u.password == goodUser.password)))
     }
 

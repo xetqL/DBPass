@@ -6,7 +6,7 @@ version := "1.0.0-SNAPSHOT"
 
 scalaVersion := "2.11.6"
 
-scalacOptions := Seq("-deprecation", "-encoding", "utf8")
+scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-encoding", "utf8")
 
 resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 

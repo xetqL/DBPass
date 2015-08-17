@@ -7,7 +7,7 @@ import spray.json._
  * Created by aboul on 11.08.2015.
  */
 
-trait TResponse {
+sealed trait TResponse {
     val status: Status
     val message: String
     def toJSON : JsObject = JsObject(
@@ -15,14 +15,15 @@ trait TResponse {
         "message"-> JsString(message)
     )
 }
+
 trait LoginResponseComponent extends TResponse { this : TResponse =>
-    def token:String
-    override def toJSON = JsObject((super.toJSON.fields + ("token" -> JsString(token))).toSeq:_*)
+    def token: String
+    override def toJSON = JsObject((super.toJSON.fields + ("token" -> JsString(token))).toSeq: _*)
 }
 
 trait ActionResponseComponent extends TResponse { this : TResponse =>
     def action: Action
-    override def toJSON = JsObject((super.toJSON.fields + ("action" -> JsString(action.getClass.getSimpleName))).toSeq:_*)
+    override def toJSON = JsObject((super.toJSON.fields + ("action" -> JsString(action.getClass.getSimpleName))).toSeq: _*)
 }
 
-case class Response(val status:Status, val message:String) extends TResponse
+case class Response(val status: Status, val message: String) extends TResponse
