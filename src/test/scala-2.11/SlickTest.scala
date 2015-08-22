@@ -5,6 +5,7 @@ import Model.{User, DAL}
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.concurrent._
+import org.slf4j.Logger
 import slick.driver.H2Driver
 import slick.driver.H2Driver.api.{Database => _, _}
 import slick.jdbc.JdbcBackend.Database
@@ -13,7 +14,7 @@ import util.Util
 /**
  * Created by xetqL on 15.08.2015.
  */
-class SlickTest extends FunSuite with BeforeAndAfter with ScalaFutures{
+class SlickTest extends FunSuite with BeforeAndAfter with ScalaFutures {
     implicit override val patienceConfig = PatienceConfig(timeout = Span(5, Seconds))
     val dal = new DAL(H2Driver)
     implicit var db: Database = _
@@ -79,6 +80,13 @@ class SlickTest extends FunSuite with BeforeAndAfter with ScalaFutures{
         val badUserExists = check(testBadUser)
         assert(goodUserExists === true)
         assert(badUserExists === false)
+    }
+
+    test("Refresh user update the user ID"){
+        createSchema()
+        insertUser(testGoodUser)
+        val insertedGoodUser = refreshUser(testGoodUser)
+        assert(insertedGoodUser.userID == 1)
     }
 
     test("Token addTokenFor should insert a token for a user"){

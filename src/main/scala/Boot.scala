@@ -46,6 +46,5 @@ object Boot extends App with MySslConfiguration{
     try {
         //run(new DAL(PostgresDriver), Database.forConfig(productionDatabaseConfigName))
         run(new DAL(H2Driver), Database.forURL("jdbc:h2:mem:", driver="org.h2.Driver"))
-
     } finally unloadDrivers
 }

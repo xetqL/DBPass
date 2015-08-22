@@ -10,13 +10,14 @@ import scala.language.implicitConversions
 import scala.language.postfixOps
 
 // custom case class mapping
-case class User (userID: Int, username: String, password: String) {
-    def this(username: String, password: String) = this(0, username, password)
-}
+case class User private (val userID: Int, val username: String, val password: String)
 
 object User extends((Int, String, String) => User){
-    def apply(username: String, password: String) = new User(username, password)
-    implicit def userPass2User(userPass: UserPass) = new User(userPass.user, userPass.pass)
+    def == (that:User) : Boolean = ???
+    //manual user creation
+    def apply(username: String, password: String) = new User(-1, username, Util.cypher(password))
+    //unapply is used to map from the database
+    implicit def userPass2User(userPass: UserPass) = new User(-1, userPass.user, userPass.pass)
     implicit def user2UserPass(user: User) = UserPass(user = user.username, pass = user.password)
 }
 
@@ -40,11 +41,11 @@ trait UsersComponent {
 
     val users = TableQuery[Users]
 
-    def insert(user: User) = (users returning users.map(_.userID)) += User(user.userID, user.username, Util.cypher(user.password))
+    def insert(user: User) = (users returning users.map(_.userID)) += user
 
     def insertAndRun(user: User)(implicit db : Database) = db.run(insert(user))
 
-    def check(user: User) = users filter (u => (u.username === user.username) && (u.passwordHash === Util.cypher(user.password))) exists
+    def check(user: User) = users filter (u => (u.username === user.username) && (u.passwordHash === user.password)) exists
 
     def get(username: String) = {
         val q = for {u <- users if (u.username === username)} yield u
