@@ -52,7 +52,7 @@ class RoutesTest extends Specification with Specs2RouteTest with IDBService with
             }
         }
 
-        "return a accepted response when submitting a valid pair(username:token)" in {
+        "return an accepted response when submitting a valid pair(username:token)" in {
             Get(s"/shutdown?username=${goodUser.username}&token=$validToken") ~> shutdownRoute ~> check {
                 status === StatusCodes.OK
                 responseAs[String] must containing("shutdown scheduled")
@@ -65,13 +65,13 @@ class RoutesTest extends Specification with Specs2RouteTest with IDBService with
 
     "The signup route" should {
 
-        "return a rejected response when submitting bad credentials" in {
+        "return an Authentication Failed Rejection when submitting wrong credentials" in {
             Post("/signup") ~> unvalidCredentialsDirective ~> signupRoute ~> check {
                 rejection === AuthenticationFailedRejection(CredentialsRejected, List(challenge))
             }
         }
 
-        "return a accepted response when submitting good credentials" in {
+        "return HTTP OK when submitting valid user:password credentials" in {
             Post("/signup") ~> validCredentialsDirective ~> signupRoute ~> check {
                 status === StatusCodes.OK
                 responseAs[String] must contain("token")

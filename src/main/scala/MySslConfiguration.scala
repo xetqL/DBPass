@@ -1,19 +1,18 @@
 /**
  * Created by aboul on 05.08.2015.
  */
+package DBPass
 import java.security.{SecureRandom, KeyStore}
 import javax.net.ssl.{KeyManagerFactory, SSLContext, TrustManagerFactory}
 import spray.io._
 
 // for SSL support (if enabled in application.conf)
 trait MySslConfiguration {
-
     // if there is no SSLContext in scope implicitly the HttpServer uses the default SSLContext,
     // since we want non-default settings in this example we make a custom SSLContext available here
     implicit def sslContext: SSLContext = {
-        val keyStoreResource = "/ssl-test-keystore.jks"
-        val password = ""
-
+        val keyStoreResource = "/keystore.jks"
+        val password = "sslpwd"
         val keyStore = KeyStore.getInstance("jks")
         keyStore.load(getClass.getResourceAsStream(keyStoreResource), password.toCharArray)
         val keyManagerFactory = KeyManagerFactory.getInstance("SunX509")

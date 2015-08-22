@@ -1,5 +1,8 @@
 *.class
 *.log
+*.jks
+*.cer
+*.csr
 
 # sbt specific
 .cache/

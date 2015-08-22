@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  */
 object Util {
     /** A helper function to unload all JDBC drivers so we don't leak memory */
-    def unloadDrivers {
+    def unloadDrivers() = {
         DriverManager.getDrivers.asScala.foreach { d =>
             DriverManager.deregisterDriver(d)
         }
@@ -32,7 +32,10 @@ object Util {
         }
     }
 
-    def cypher(word: String) = word
+    def cypher(word: String) : String = {
+        val m = java.security.MessageDigest.getInstance("SHA-256").digest(word.getBytes("UTF-8"))
+        m.map("%02x".format(_)).mkString
+    }
 
     def userPassAuth(userPass: Option[UserPass])(implicit db: Database, dal: DAL): Future[Option[User]] = {
         userPass match {

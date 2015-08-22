@@ -10,7 +10,7 @@ import scala.language.implicitConversions
 import scala.language.postfixOps
 
 // custom case class mapping
-case class User(userID: Int, username: String, password: String) {
+case class User (userID: Int, username: String, password: String) {
     def this(username: String, password: String) = this(0, username, password)
 }
 
@@ -40,7 +40,7 @@ trait UsersComponent {
 
     val users = TableQuery[Users]
 
-    def insert(user: User) = (users returning users.map(_.userID)) += user
+    def insert(user: User) = (users returning users.map(_.userID)) += User(user.userID, user.username, Util.cypher(user.password))
 
     def insertAndRun(user: User)(implicit db : Database) = db.run(insert(user))
 

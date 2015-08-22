@@ -15,21 +15,18 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 import util.Util.unloadDrivers
-case class DatabaseCreationException(cause: Throwable) extends Exception
-
-object Boot extends App {
+object Boot extends App with MySslConfiguration{
     def logger = LoggerFactory.getLogger(this.getClass)
     def run(dal: DAL, db: Database): Unit = {
         val setupAction = DBIO.seq()
         val promiseOnSetupHTTPServer = Promise[Boolean]
-        val f = db.run(MTable.getTables).flatMap{
+        db.run(MTable.getTables).flatMap{
             tables =>
                 if(tables.map(_.name.name).count(name => Set("Users", "AuthTokens", "Keys") contains name) != 3){
                     setupAction.andThen(dal.drop).andThen(dal.create)
                 }
                 db.run(setupAction)
-        }
-        f.onComplete {
+        } onComplete {
             case Failure(error) =>
                 promiseOnSetupHTTPServer success false
             case Success(_) =>
